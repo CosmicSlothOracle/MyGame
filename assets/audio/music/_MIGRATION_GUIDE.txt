@@ -1,0 +1,61 @@
+═══════════════════════════════════════════════════════════════
+  MUSIK MIGRATIONS-GUIDE
+═══════════════════════════════════════════════════════════════
+
+SCHRITT 1: VORHANDENE DATEIEN VERSCHIEBEN/UMBENENNEN
+─────────────────────────────────────────────────────────────
+
+ALT → NEU:
+
+1. select_start_track.mp3
+   → ui/title_intro.mp3
+
+2. house_track_117bpm.mp3
+   → stages/ninja_stage.mp3
+
+
+SCHRITT 2: NEUE DATEIEN HINZUFÜGEN
+─────────────────────────────────────────────────────────────
+
+3. ui/character_select_loop.mp3
+   ← NEU ERSTELLEN/IMPORTIEREN
+   (Loop für Character Select Screen, 30-120 Sek)
+
+
+SCHRITT 3: WEITERE STAGES
+─────────────────────────────────────────────────────────────
+
+Für jede neue Stage:
+  stages/{stage_key}.mp3
+
+Beispiele:
+  - stages/industrial_zone.mp3
+  - stages/forest_temple.mp3
+  - stages/sky_fortress.mp3
+
+
+═══════════════════════════════════════════════════════════════
+  NAMENSKONVENTIONEN
+═══════════════════════════════════════════════════════════════
+
+✓ lowercase                  ✗ CamelCase, UPPERCASE
+✓ underscores               ✗ spaces, hyphens
+✓ beschreibend              ✗ generic (track1.mp3)
+✓ stage_key = filename      ✗ abweichende Namen
+
+
+═══════════════════════════════════════════════════════════════
+  AUDIO-SPEZIFIKATIONEN
+═══════════════════════════════════════════════════════════════
+
+Format:        MP3
+Bitrate:       192-320 kbps
+Sample Rate:   44.1 kHz oder 48 kHz
+Länge:         UI: 3-120 Sek | Stages: 90-180 Sek
+Loop:          Stages sollten nahtlos loopen!
+
+
+═══════════════════════════════════════════════════════════════
+Erstellt: 2025-10-08
+═══════════════════════════════════════════════════════════════
+

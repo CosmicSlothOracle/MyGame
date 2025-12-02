@@ -1,0 +1,68 @@
+const path = require("path");
+const webpack = require("webpack");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+
+const WITH_STEAM = process.env.WITH_STEAM === "true";
+const IS_ELECTRON = process.env.IS_ELECTRON === "true";
+
+module.exports = {
+  mode: process.env.NODE_ENV || "production",
+  entry: "./js/main.js", // Ihr Haupt-JavaScript-File
+  target: IS_ELECTRON ? "electron-renderer" : "web",
+  devtool:
+    process.env.NODE_ENV === "development" ? "inline-source-map" : "source-map",
+  devServer: {
+    static: "./",
+    port: 8080,
+    hot: true,
+    liveReload: true,
+    watchFiles: ["**/*.js", "**/*.html", "**/*.css"],
+  },
+  output: {
+    filename: "bundle.js",
+    path: path.resolve(__dirname, "dist"),
+    clean: true,
+  },
+  resolve: {
+    extensions: [".js", ".json"],
+    fallback: {
+      fs: false,
+      path: false,
+    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+          },
+        },
+      },
+    ],
+  },
+  optimization: {
+    minimize: process.env.NODE_ENV !== "development", // Production: Minifizierung aktiv
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      "process.env.WITH_STEAM": JSON.stringify(WITH_STEAM ? "true" : "false"),
+      "process.env.IS_ELECTRON": JSON.stringify(IS_ELECTRON ? "true" : "false"),
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, "assets"),
+          to: path.resolve(__dirname, "dist", "assets"),
+        },
+        {
+          from: path.resolve(__dirname, "data"),
+          to: path.resolve(__dirname, "dist", "data"),
+        },
+      ],
+    }),
+  ],
+};

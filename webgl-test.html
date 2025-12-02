@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebGL Schnelltest</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #222;
+        color: white;
+      }
+      canvas {
+        border: 2px solid #444;
+        background: #333;
+      }
+      .info {
+        margin-top: 20px;
+        padding: 15px;
+        background: #444;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebGL Schnelltest</h1>
+    <canvas id="test" width="800" height="600"></canvas>
+
+    <div class="info">
+      <h3>Test-Ergebnis:</h3>
+      <div id="result">Wird getestet...</div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("test");
+      const resultDiv = document.getElementById("result");
+
+      try {
+        const gl =
+          canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+
+        if (gl) {
+          resultDiv.innerHTML = "✅ <strong>WebGL funktioniert!</strong><br>";
+          resultDiv.innerHTML += `Vendor: ${gl.getParameter(gl.VENDOR)}<br>`;
+          resultDiv.innerHTML += `Renderer: ${gl.getParameter(
+            gl.RENDERER
+          )}<br>`;
+          resultDiv.innerHTML += `Version: ${gl.getParameter(gl.VERSION)}<br>`;
+          resultDiv.innerHTML += `Max Texture Size: ${gl.getParameter(
+            gl.MAX_TEXTURE_SIZE
+          )}<br>`;
+
+          // Einfacher Test-Render
+          gl.clearColor(0.2, 0.4, 0.8, 1.0);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+
+          console.log("WebGL Test erfolgreich");
+        } else {
+          resultDiv.innerHTML =
+            "❌ <strong>WebGL nicht unterstützt!</strong><br>";
+          resultDiv.innerHTML += "Mögliche Ursachen:<br>";
+          resultDiv.innerHTML += "- GPU-Blocklist<br>";
+          resultDiv.innerHTML += "- Hardware-Beschleunigung deaktiviert<br>";
+          resultDiv.innerHTML += "- Veraltete Grafikkartentreiber<br>";
+          resultDiv.innerHTML += "- Electron GPU-Probleme";
+
+          console.error("WebGL nicht verfügbar");
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `❌ <strong>Fehler beim WebGL-Test:</strong><br>${error.message}`;
+        console.error("WebGL Test Fehler:", error);
+      }
+    </script>
+  </body>
+</html>

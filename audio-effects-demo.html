@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audio Effects Demo - Kill Zone & Dance Battle</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #1a1a1a;
+        color: #fff;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .demo-section {
+        background: #2a2a2a;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+        border: 2px solid #444;
+      }
+      .demo-section h2 {
+        color: #ff6b6b;
+        margin-top: 0;
+      }
+      .demo-section h3 {
+        color: #4ecdc4;
+      }
+      button {
+        background: #4ecdc4;
+        color: #1a1a1a;
+        border: none;
+        padding: 12px 24px;
+        margin: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+      }
+      button:hover {
+        background: #45b7b8;
+      }
+      button:disabled {
+        background: #666;
+        cursor: not-allowed;
+      }
+      .effect-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .slider-container {
+        display: flex;
+        flex-direction: column;
+        margin: 10px 0;
+      }
+      .slider-container label {
+        margin-bottom: 5px;
+        font-size: 12px;
+      }
+      input[type="range"] {
+        width: 200px;
+      }
+      .status {
+        background: #333;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      .audio-info {
+        background: #1a3a1a;
+        border: 1px solid #4a7c4a;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎵 Audio Effects Demo</h1>
+      <p>
+        Teste die neuen spielreaktiven Audio-Effekte für Kill Zone und Dance
+        Battle!
+      </p>
+
+      <!-- Audio System Status -->
+      <div class="demo-section">
+        <h2>🎵 Audio System Status</h2>
+        <div class="audio-info">
+          <div>
+            Audio Context: <span id="audioContextStatus">Initializing...</span>
+          </div>
+          <div>Current Track: <span id="currentTrack">None</span></div>
+          <div>Web Audio API: <span id="webAudioStatus">Checking...</span></div>
+        </div>
+        <button onclick="initAudio()">Initialize Audio System</button>
+        <button onclick="playTestTrack()">Play Test Track</button>
+        <button onclick="stopMusic()">Stop Music</button>
+      </div>
+
+      <!-- Kill Zone Effects -->
+      <div class="demo-section">
+        <h2>💀 Kill Zone Death Effects</h2>
+        <p>
+          Simuliert die Effekt-Sequenz:
+          <strong>Distortion → Lowpass + Reverb → Respawn → Normal</strong>
+        </p>
+
+        <div class="effect-controls">
+          <button onclick="triggerDeathEffect(0)">Player 1 Death</button>
+          <button onclick="triggerDeathEffect(1)">Player 2 Death</button>
+          <button onclick="testDeathSequence()">Full Death Sequence</button>
+        </div>
+
+        <div class="status" id="deathStatus">
+          Ready to test death effects...
+        </div>
+      </div>
+
+      <!-- Dance Battle Effects -->
+      <div class="demo-section">
+        <h2>💃 Dance Battle Effects</h2>
+        <p>
+          Simuliert progressive Effekte:
+          <strong>Filter-Sweep + Reverb</strong> basierend auf Beat-Intensität
+        </p>
+
+        <div class="effect-controls">
+          <button onclick="startDanceBattle()">Start Dance Battle</button>
+          <button onclick="endDanceBattle()">End Dance Battle</button>
+          <button onclick="triggerKnockback()">Trigger Knockback</button>
+          <button onclick="triggerPerfectBeat(0)">Perfect Beat P1</button>
+          <button onclick="triggerPerfectBeat(1)">Perfect Beat P2</button>
+          <button onclick="resetPerfectBeats()">Reset Perfect Beats</button>
+        </div>
+
+        <div class="slider-container">
+          <label for="danceIntensity">Dance Intensity (0-1):</label>
+          <input
+            type="range"
+            id="danceIntensity"
+            min="0"
+            max="1"
+            step="0.1"
+            value="0"
+            oninput="updateDanceEffects()"
+          />
+          <span id="intensityValue">0.0</span>
+        </div>
+
+        <div class="slider-container">
+          <label for="beatProgress">Beat Progress (0-1):</label>
+          <input
+            type="range"
+            id="beatProgress"
+            min="0"
+            max="1"
+            step="0.1"
+            value="0"
+            oninput="updateDanceEffects()"
+          />
+          <span id="beatValue">0.0</span>
+        </div>
+
+        <div class="status" id="danceStatus">
+          Ready to test dance battle effects...
+        </div>
+      </div>
+
+      <!-- Manual Effect Controls -->
+      <div class="demo-section">
+        <h2>🎛️ Manual Effect Controls</h2>
+        <p>Direkte Kontrolle über einzelne Effekte</p>
+
+        <div class="effect-controls">
+          <button onclick="setDistortion(0)">No Distortion</button>
+          <button onclick="setDistortion(0.3)">Light Distortion</button>
+          <button onclick="setDistortion(0.7)">Heavy Distortion</button>
+          <button onclick="setReverb(0)">No Reverb</button>
+          <button onclick="setReverb(0.3)">Light Reverb</button>
+          <button onclick="setReverb(0.6)">Heavy Reverb</button>
+        </div>
+
+        <div class="status" id="manualStatus">Manual controls ready...</div>
+      </div>
+    </div>
+
+    <!-- Load Audio System -->
+    <script src="js/audio-system.js"></script>
+
+    <script>
+      let audioSystem = null;
+      let isDanceBattleActive = false;
+      let danceIntensity = 0;
+      let beatProgress = 0;
+
+      function initAudio() {
+        if (window.AudioSystem) {
+          window.AudioSystem.init();
+          audioSystem = window.AudioSystem;
+          updateStatus("audioContextStatus", "Initialized");
+          updateStatus("webAudioStatus", "Available");
+          updateStatus("deathStatus", "Audio system ready for death effects");
+          updateStatus(
+            "danceStatus",
+            "Audio system ready for dance battle effects"
+          );
+          updateStatus(
+            "manualStatus",
+            "Audio system ready for manual controls"
+          );
+        } else {
+          updateStatus("audioContextStatus", "Error: AudioSystem not found");
+          updateStatus("webAudioStatus", "Error");
+        }
+      }
+
+      function playTestTrack() {
+        if (audioSystem) {
+          audioSystem.playTrack("PVP_STAGE");
+          updateStatus("currentTrack", "PVP_STAGE");
+          updateStatus(
+            "deathStatus",
+            "Test track playing - ready for death effects"
+          );
+          updateStatus(
+            "danceStatus",
+            "Test track playing - ready for dance battle effects"
+          );
+        }
+      }
+
+      function stopMusic() {
+        if (audioSystem) {
+          audioSystem.stopMusic(1.0);
+          updateStatus("currentTrack", "None");
+        }
+      }
+
+      function triggerDeathEffect(playerIndex) {
+        if (audioSystem) {
+          audioSystem.triggerDeathEffect(playerIndex);
+          updateStatus(
+            "deathStatus",
+            `Death effect triggered for Player ${playerIndex + 1}`
+          );
+        }
+      }
+
+      function testDeathSequence() {
+        if (audioSystem) {
+          updateStatus("deathStatus", "Testing full death sequence...");
+          triggerDeathEffect(0);
+          setTimeout(() => triggerDeathEffect(1), 1200);
+        }
+      }
+
+      function startDanceBattle() {
+        if (audioSystem) {
+          isDanceBattleActive = true;
+          audioSystem.startDancePhase(null, {
+            filterFreq: 20000,
+            bpm: 120,
+          });
+          updateStatus(
+            "danceStatus",
+            "Dance Battle started - filter opens over 4 beats"
+          );
+        }
+      }
+
+      function endDanceBattle() {
+        if (audioSystem) {
+          isDanceBattleActive = false;
+          audioSystem.endDancePhase(2.0, { filterFreq: 120 });
+          audioSystem.resetDanceBattleEffects();
+          updateStatus("danceStatus", "Dance Battle ended - effects reset");
+        }
+      }
+
+      function triggerKnockback() {
+        if (audioSystem) {
+          const intensity = Math.random() * 0.8 + 0.2; // 0.2 to 1.0
+          audioSystem.triggerDanceKnockbackEffect(intensity);
+          updateStatus(
+            "danceStatus",
+            `Knockback effect triggered (intensity: ${intensity.toFixed(2)})`
+          );
+        }
+      }
+
+      function updateDanceEffects() {
+        if (audioSystem && isDanceBattleActive) {
+          danceIntensity = parseFloat(
+            document.getElementById("danceIntensity").value
+          );
+          beatProgress = parseFloat(
+            document.getElementById("beatProgress").value
+          );
+
+          document.getElementById("intensityValue").textContent =
+            danceIntensity.toFixed(1);
+          document.getElementById("beatValue").textContent =
+            beatProgress.toFixed(1);
+
+          audioSystem.updateDanceBattleEffects(danceIntensity, beatProgress);
+          updateStatus(
+            "danceStatus",
+            `Dance effects updated - Intensity: ${danceIntensity.toFixed(
+              1
+            )}, Beat: ${beatProgress.toFixed(1)}`
+          );
+        }
+      }
+
+      function setDistortion(intensity) {
+        if (audioSystem) {
+          // This would require direct access to the WaveShaper node
+          // For now, we'll use the death effect as a proxy
+          if (intensity > 0) {
+            audioSystem.triggerDeathEffect(0);
+          }
+          updateStatus("manualStatus", `Distortion set to ${intensity}`);
+        }
+      }
+
+      function setReverb(intensity) {
+        if (audioSystem) {
+          // This would require direct access to the delay/reverb nodes
+          // For now, we'll simulate with dance battle effects
+          if (intensity > 0) {
+            audioSystem.updateDanceBattleEffects(intensity, 0.5);
+          } else {
+            audioSystem.resetDanceBattleEffects();
+          }
+          updateStatus("manualStatus", `Reverb set to ${intensity}`);
+        }
+      }
+
+      function triggerPerfectBeat(playerIndex) {
+        if (audioSystem) {
+          audioSystem.triggerPerfectBeatEffect(playerIndex);
+          updateStatus(
+            "danceStatus",
+            `Perfect Beat ${playerIndex + 1} triggered`
+          );
+        }
+      }
+
+      function resetPerfectBeats() {
+        if (audioSystem) {
+          audioSystem.resetPerfectBeatEffects();
+          updateStatus("danceStatus", "Perfect beat effects reset");
+        }
+      }
+
+      function updateStatus(elementId, message) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.textContent = message;
+          console.log(`[${elementId}] ${message}`);
+        }
+      }
+
+      // Auto-initialize on page load
+      window.addEventListener("load", () => {
+        setTimeout(initAudio, 500);
+      });
+    </script>
+  </body>
+</html>

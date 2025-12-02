@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Icon Creator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      canvas {
+        border: 1px solid #ccc;
+        margin: 10px;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>🎮 Simple Game Icon Creator</h2>
+
+    <canvas id="iconCanvas" width="512" height="512"></canvas>
+    <br />
+
+    <button onclick="createNinjaIcon()">Create Ninja Icon</button>
+    <button onclick="createTextIcon()">Create "NS" Text Icon</button>
+    <button onclick="downloadIcon()">Download as PNG</button>
+
+    <script>
+      const canvas = document.getElementById("iconCanvas");
+      const ctx = canvas.getContext("2d");
+
+      function createNinjaIcon() {
+        // Clear canvas
+        ctx.fillStyle = "#1a1a1a";
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Draw simple ninja silhouette
+        ctx.fillStyle = "#333";
+        ctx.beginPath();
+        ctx.arc(256, 200, 60, 0, Math.PI * 2); // Head
+        ctx.fill();
+
+        // Body
+        ctx.fillRect(220, 260, 72, 120);
+
+        // Arms
+        ctx.fillRect(180, 280, 40, 80);
+        ctx.fillRect(292, 280, 40, 80);
+
+        // Legs
+        ctx.fillRect(240, 380, 30, 80);
+        ctx.fillRect(242, 380, 30, 80);
+
+        // Simple sword
+        ctx.fillStyle = "#666";
+        ctx.fillRect(320, 200, 8, 100);
+        ctx.fillRect(315, 200, 18, 8);
+      }
+
+      function createTextIcon() {
+        // Clear canvas
+        ctx.fillStyle = "#2a2a2a";
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Draw "NS" text
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 200px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("NS", 256, 320);
+      }
+
+      function downloadIcon() {
+        const link = document.createElement("a");
+        link.download = "icon.png";
+        link.href = canvas.toDataURL();
+        link.click();
+      }
+
+      // Create default ninja icon
+      createNinjaIcon();
+    </script>
+  </body>
+</html>
